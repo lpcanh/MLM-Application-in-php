@@ -72,14 +72,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 
 switch (ENVIRONMENT) {
-    case 'production':
-        $active_group = 'production';
+    case "production":
+        $active_group = "production";
         break;
     default:
         $active_group = 'default';
         break;
 }
-
+$active_record = TRUE;
 $query_builder = TRUE;
 
 $db['default'] = array(
