@@ -3,307 +3,251 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 
+class ProductController extends CI_Controller
+{
 
-class ProductController extends CI_Controller {
+    public function __construct()
 
- 	public function __construct()
+    {
 
-        {
+        parent::__construct();
 
-                parent::__construct();
+        $this->load->model(['ProductModel', 'CategoryModel']);
 
-				$this->load->model(['ProductModel','CategoryModel']);
+        $this->SeesionModel->not_logged_in();
+        $this->SeesionModel->is_logged_Admin();
 
-                $this->SeesionModel->not_logged_in();
-				$this->SeesionModel->is_logged_Admin();
+    }
+
+
+    public function index()
+
+    {
+
+        $data['category'] = $this->CategoryModel->DropDownCategory();
+
+        $this->parser->parse('product/add_product_template', $data);
+
+    }
+
+    public function product_list_template()
+
+    {
+
+        $this->parser->parse('product/product_list_template', []);
+
+    }
+
+
+    public function add_product()
+    {
+
+        $this->OuthModel->CSRFVerify();
+
+
+        //$this->form_validation->set_rules('product_Id', 'product id', 'required');
+
+        $this->form_validation->set_rules('ProductName', 'Product Name', 'required');
+
+        $this->form_validation->set_rules('Price', 'Price', 'required');
+
+        $this->form_validation->set_rules('SalePrice', 'Sale Price', 'required');
+
+
+        if ($this->form_validation->run() == FALSE) {
+
+            $response = ['status' => 0, 'message' => '<span style="color:#900;">' . validation_errors() . '</span>'];
+
+
+        } else {
+
+
+            $post = $this->input->post();
+
+
+            if (isset($_FILES['product_Image']['name']) && !empty($_FILES['product_Image']['name'])) {
+
+
+                $config['upload_path'] = './uploads/products';
+
+                $config['allowed_types'] = 'png|jpg|jpeg';
+
+                $config['max_size'] = 500;
+
+                //$config['max_width']            = 1024;
+
+                //$config['max_height']           = 768;
+
+                $this->load->library('upload', $config);
+
+                if (!$this->upload->do_upload('product_Image')) {
+
+                    $AtError = $this->upload->display_errors();
+
+                    echo json_encode(['status' => 0, 'message' => $AtError]);
+
+                    die;
+
+                } else {
+
+                    $file_data = $this->upload->data();
+
+                    $post['productImage'] = $file_data['file_name'];
+
+                }
+
+            }
+
+
+            $post['user_id'] = $this->session->userdata['Admin']['id'];
+
+            //$post['product_Id'] = $post['product_Id'];
+
+            $post['Available_qty'] = $post['Available_qty'];
+
+            $post['sgst'] = $post['sgst'];
+            $post['cgst'] = $post['cgst'];
+            $post['igst'] = $post['igst'];
+
+            $post['ProductName'] = $post['ProductName'];
+
+            $post['ProductCategory'] = $post['ProductCategory'];
+
+            $post['SKU'] = $post['SKU'];
+
+            $post['Price'] = $post['Price'];
+            $post['hsn'] = $post['hsn'];
+            $post['sac'] = $post['sac'];
+
+            $post['SalePrice'] = $post['SalePrice'];
+
+            $post['description'] = $post['description'];
+
+            $post['ip_address'] = $this->input->ip_address();
+
+            $post['create_date'] = date('Y-m-d H:i:s');
+
+
+            unset($post['product_Id'], $post['product_Image']);
+
+
+            $query = $this->ProductModel->AddProduct($this->OuthModel->xss_clean($post));
+
+
+            $response = '';
+
+            if ($query == true) {
+
+                $response = ['status' => 1, 'message' => '<span style="color:#090;">Product added Successfully !</span>'];
+
+            } else {
+
+                $response = ['status' => 0, 'message' => '<span style="color:#900;">sorry we re having some technical problems. please try again !</span>'];
+
+            }
 
         }
 
-	
 
-	public function index() 
+        echo json_encode($response);
 
-	{
 
-		$data['category']=$this->CategoryModel->DropDownCategory();
+    }
 
-  		$this->parser->parse('product/add_product_template',$data);
+    public function product_grid_data()
+    {
+        log_message('debug', 'product_grid_data: ' . json_encode($_REQUEST));
+        $this->OuthModel->CSRFVerify();
 
-	}
+        // storing  request (ie, get/post) global array to a variable
 
-	public function product_list_template() 
+        $requestData = $_REQUEST;
 
-	{
+        //print_r($requestData);
 
-  		$this->parser->parse('product/product_list_template',[]);
 
-	}
+        $table = "products";
 
-	
+        $fields = "id,ProductName,Price, SalePrice, productImage, create_date ";
 
-	public function add_product(){
+        $id = '';
 
-		$this->OuthModel->CSRFVerify();
+        $where = " ";
 
-		
+        $sql = "SELECT " . $fields;
 
- 		//$this->form_validation->set_rules('product_Id', 'product id', 'required');
+        $sql .= " FROM " . $table . $where;
 
-		$this->form_validation->set_rules('ProductName', 'Product Name', 'required');
+        //echo $sql;
 
-		$this->form_validation->set_rules('Price', 'Price', 'required');
+        $query = $this->db->query($sql);
 
-		$this->form_validation->set_rules('SalePrice', 'Sale Price', 'required');
+        $queryqResults = $query->result();
 
- 
+        $totalData = $query->num_rows(); // rules datatable
 
- 		
+        $totalFiltered = $totalData; // rules datatable
 
- 		
 
-		 if ($this->form_validation->run() == FALSE)
+        $where = " ";
 
-         {
+        $sql = "SELECT " . $fields;
 
- 			 $response = ['status' => 0 ,'message' => '<span style="color:#900;">'.validation_errors().'</span>' ];
+        $sql .= " FROM " . $table . $where;
 
-			  
 
-         }else{
+        if (!empty($requestData['search']['value'])) {   // if there is a search parameter, $requestData['search']['value'] contains search parameter
 
-			 
 
-				$post = $this->input->post();
+            $searchValue = $requestData['search']['value'];
 
-				
 
- 				if(isset($_FILES['product_Image']['name']) && !empty($_FILES['product_Image']['name'])){	
+            $sql .= " WHERE `ProductName` LIKE '%" . $searchValue . "%' ";
 
+            $sql .= " OR `Price` LIKE '%" . $searchValue . "%' ";
 
+            $sql .= " OR `SalePrice` LIKE '%" . $searchValue . "%' ";
 
-					$config['upload_path']          = './uploads/products';
+        }
 
-					$config['allowed_types']        = 'png|jpg|jpeg';
 
-					$config['max_size']             = 500;
+        $query = $this->db->query($sql);
 
-					 //$config['max_width']            = 1024;
+        $totalFiltered = $query->num_rows(); // rules datatable
 
- 					//$config['max_height']           = 768;
+        //ORDER BY id DESC
 
-					 $this->load->library('upload', $config);
+        $sql .= " ORDER BY create_date  " . $requestData['order'][0]['dir'] . "  LIMIT " . $requestData['start'] . " ," . $requestData['length'] . "   ";
 
-					 if ( ! $this->upload->do_upload('product_Image'))
+        $query = $this->db->query($sql);
 
-					 {
+        //echo $sql;
 
-							$AtError = $this->upload->display_errors();
+        $SearchResults = $query->result();
 
-							echo json_encode(['status' => 0 ,'message' => $AtError]);
 
-							die;
+        $data = array();
 
-					 }
+        foreach ($SearchResults as $row) {
 
-					 else
+            $nestedData = array();
 
-					 {
 
-							$file_data = $this->upload->data();
+            $id = $row->id;
 
-							$post['productImage'] = $file_data['file_name'];
 
-					 }
+            $url_id = $this->OuthModel->Encryptor('encrypt', $row->id);
 
-				}
 
-			
+            $tableCheckTD = "<label class='pos-rel'><input type='checkbox' class='ace' /><span class='lbl'></span></label>";
 
-				 
-
-				 $post['user_id'] = $this->session->userdata['Admin']['id'];
-
-				 //$post['product_Id'] = $post['product_Id'];
-
-				 $post['Available_qty'] = $post['Available_qty'];
-
-				 $post['sgst'] = $post['sgst'];
-				 $post['cgst'] = $post['cgst'];
-				 $post['igst'] = $post['igst'];
-
-				 $post['ProductName'] = $post['ProductName'];
-
-				 $post['ProductCategory'] = $post['ProductCategory'];
-
-				 $post['SKU'] = $post['SKU'];
-
-				 $post['Price'] = $post['Price'];
-				  $post['hsn'] = $post['hsn']; 
-				   $post['sac'] = $post['sac'];
-
-				 $post['SalePrice'] = $post['SalePrice'];
-
-				 $post['description'] = $post['description'];
-
- 				 $post['ip_address'] = $this->input->ip_address();
-
-				 $post['create_date'] = date('Y-m-d H:i:s');
-
-				 
-
-				 unset($post['product_Id'],$post['product_Image']);
-
-				  
-
- 				$query = $this->ProductModel->AddProduct($this->OuthModel->xss_clean($post));
-
-				 
-
-				$response='';
-
-				if($query == true){
-
-					$response = ['status' => 1 ,'message' => '<span style="color:#090;">Product added Successfully !</span>' ];
-
-				}else{
-
-					$response = ['status' => 0 ,'message' => '<span style="color:#900;">sorry we re having some technical problems. please try again !</span>' 						];
-
-				}
-
-           }
-
-		   
-
-		   echo json_encode($response);
-
-		
-
- 	}
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	
-
-	public function product_grid_data()
-
-	{
-
-		$this->OuthModel->CSRFVerify();
-
- 		// storing  request (ie, get/post) global array to a variable  
-
-		$requestData = $_REQUEST;
-
- 		//print_r($requestData);
-
- 
-
-  		$table = "products";
-
-		$fields = "id,ProductName,Price, SalePrice, productImage, create_date ";
-
- 		$id = '';
-
-		$where = " ";
-
- 		$sql = "SELECT ".$fields;
-
-		$sql.=" FROM ".$table. $where;
-
- 		//echo $sql;
-
- 		$query = $this->db->query($sql);
-
-		$queryqResults = $query->result();
-
- 		$totalData = $query->num_rows(); // rules datatable
-
-		$totalFiltered = $totalData; // rules datatable
-
-  		
-
-		$where = " ";
-
- 		$sql = "SELECT ".$fields;
-
- 		$sql.=" FROM ".$table . $where ;
-
- 		
-
-  		
-
-		if( !empty($requestData['search']['value']) ) {   // if there is a search parameter, $requestData['search']['value'] contains search parameter
-
-			
-
-			$searchValue = $requestData['search']['value'];
-
- 				
-
-			$sql.=" WHERE `ProductName` LIKE '%".$searchValue."%' ";   
-
- 			$sql.=" OR `Price` LIKE '%".$searchValue."%' ";
-
- 			$sql.=" OR `SalePrice` LIKE '%".$searchValue."%' ";
-
-		}
-
- 		
-
-		
-
- 		$query = $this->db->query($sql);
-
- 		$totalFiltered = $query->num_rows(); // rules datatable
-
- 		//ORDER BY id DESC	
-
- 		$sql.=" ORDER BY create_date  ".$requestData['order'][0]['dir']."  LIMIT ".$requestData['start']." ,".$requestData['length']."   ";
-
- 		$query = $this->db->query($sql);
-
- 		//echo $sql;
-
- 		$SearchResults = $query->result();
-
-		
-
-  		$data = array();
-
-		foreach($SearchResults as $row){
-
-			$nestedData=array(); 
-
-			
-
-			$id = $row->id;
-
-			
-
-			$url_id=$this->OuthModel->Encryptor('encrypt',$row->id);
-
-			
-
-			$tableCheckTD = "<label class='pos-rel'><input type='checkbox' class='ace' /><span class='lbl'></span></label>";
-
- 			$action =  '<div class="action-buttons"><a href="'.base_url('v3/product-view?id='.$url_id).'" class="green" href="javascript:void(0);">
+            $action = '<div class="action-buttons"><a href="' . base_url('v3/product-view?id=' . $url_id) . '" class="green" href="javascript:void(0);">
 
 																	<i class="ace-icon fa fa-eye bigger-130"></i>
 
 																</a>&nbsp;&nbsp;&nbsp;
 
- 																<a onclick="trash('.$id.')"  class="red trashID" href="javascript:void(0);">
+ 																<a onclick="trash(' . $id . ')"  class="red trashID" href="javascript:void(0);">
 
 																	<i class="ace-icon fa fa-trash-o bigger-130"></i>
 
@@ -311,247 +255,211 @@ class ProductController extends CI_Controller {
 
  															</div>';
 
- 			
 
- 			$nestedData[] = '<span class="nameID_'.$id.'"><img src="'.base_url('uploads/products/'.$row->productImage).'" class="img-thumbnail imgcls"></span>';
+            $nestedData[] = '<span class="nameID_' . $id . '"><img src="' . base_url('uploads/products/' . $row->productImage) . '" class="img-thumbnail imgcls"></span>';
 
-			$nestedData[] = '<span class="nameID_'.$id.'">'.$row->ProductName.'</span>';
+            $nestedData[] = '<span class="nameID_' . $id . '">' . $row->ProductName . '</span>';
 
-			$nestedData[] = '<span class="contactID_'.$id.'">'.$row->Price.'</span>';
+            $nestedData[] = '<span class="contactID_' . $id . '">' . $row->Price . '</span>';
 
-			$nestedData[] = '<span class="contactID_'.$id.'">'.$row->SalePrice.'</span>';
+            $nestedData[] = '<span class="contactID_' . $id . '">' . $row->SalePrice . '</span>';
 
-			$nestedData[] = '<span class="contactID_'.$id.'">Active</span>';
+            $nestedData[] = '<span class="contactID_' . $id . '">Active</span>';
 
-			$nestedData[] = $row->create_date;
+            $nestedData[] = $row->create_date;
 
-			$nestedData[] =  $action; 
+            $nestedData[] = $action;
 
-  			$data[] = $nestedData;
+            $data[] = $nestedData;
 
-		}
+        }
 
- 		$json_data = array(
+        $json_data = array(
 
-					"draw"            => intval( $requestData['draw'] ),  
+            "draw" => intval($requestData['draw']),
 
-					"recordsTotal"    => intval( $totalData ),  // total number of records
+            "recordsTotal" => intval($totalData),  // total number of records
 
-					"recordsFiltered" => intval( $totalFiltered ), // total number of records after searching,  
+            "recordsFiltered" => intval($totalFiltered), // total number of records after searching,
 
-					"data"            => $data   // total data array
+            "data" => $data   // total data array
 
-					);
+        );
 
- 		echo json_encode($json_data);  // send data as json format					
+        echo json_encode($json_data);  // send data as json format
 
-				
 
-	}
+    }
 
-	
 
-	public function product_view(){ 
+    public function product_view()
+    {
 
-		
 
-		$id=$this->OuthModel->Encryptor('decrypt',$this->input->get('id'));
+        $id = $this->OuthModel->Encryptor('decrypt', $this->input->get('id'));
 
-		//echo $id;
+        //echo $id;
 
-		$data['product'] = $this->ProductModel->GetProductById($id);
+        $data['product'] = $this->ProductModel->GetProductById($id);
 
-		$data['category']=$this->CategoryModel->DropDownCategory();
+        $data['category'] = $this->CategoryModel->DropDownCategory();
 
-		$this->parser->parse('product/edit_product_template',$data);
+        $this->parser->parse('product/edit_product_template', $data);
 
-	}
+    }
 
-	public function edit_product(){
+    public function edit_product()
+    {
 
-		$this->OuthModel->CSRFVerify();
+        $this->OuthModel->CSRFVerify();
 
-		
 
- 		//$this->form_validation->set_rules('product_Id', 'product id', 'required');
+        //$this->form_validation->set_rules('product_Id', 'product id', 'required');
 
-		$this->form_validation->set_rules('ProductName', 'Product Name', 'required');
+        $this->form_validation->set_rules('ProductName', 'Product Name', 'required');
 
-		$this->form_validation->set_rules('Price', 'Price', 'required');
+        $this->form_validation->set_rules('Price', 'Price', 'required');
 
-		$this->form_validation->set_rules('SalePrice', 'Sale Price', 'required');
+        $this->form_validation->set_rules('SalePrice', 'Sale Price', 'required');
 
- 
 
- 		
+        if ($this->form_validation->run() == FALSE) {
 
- 		
+            $response = ['status' => 0, 'message' => '<span style="color:#900;">' . validation_errors() . '</span>'];
 
-		 if ($this->form_validation->run() == FALSE)
 
-         {
+        } else {
 
- 			 $response = ['status' => 0 ,'message' => '<span style="color:#900;">'.validation_errors().'</span>' ];
 
-			  
+            $post = $this->input->post();
 
-         }else{
 
-			 
+            //print_r($_FILES['productImage']); die;
 
-				$post = $this->input->post();
 
-				
+            if (isset($_FILES['product_Image']['name']) && !empty($_FILES['product_Image']['name'])) {
 
-				//print_r($_FILES['productImage']); die;
 
-				
+                $config['upload_path'] = './uploads/products';
 
- 				if(isset($_FILES['product_Image']['name']) && !empty($_FILES['product_Image']['name'])){	
+                $config['allowed_types'] = 'png|jpg|jpeg';
 
+                $config['max_size'] = 500;
 
+                //$config['max_width']            = 1024;
 
-					$config['upload_path']          = './uploads/products';
+                //$config['max_height']           = 768;
 
-					$config['allowed_types']        = 'png|jpg|jpeg';
+                $this->load->library('upload', $config);
 
-					$config['max_size']             = 500;
+                if (!$this->upload->do_upload('product_Image')) {
 
-					 //$config['max_width']            = 1024;
+                    $AtError = $this->upload->display_errors();
 
- 					//$config['max_height']           = 768;
+                    echo json_encode(['status' => 0, 'message' => $AtError]);
 
-					 $this->load->library('upload', $config);
+                    die;
 
-					 if ( ! $this->upload->do_upload('product_Image'))
+                } else {
 
-					 {
+                    $file_data = $this->upload->data();
 
-							$AtError = $this->upload->display_errors();
+                    $post['productImage'] = $file_data['file_name'];
 
-							echo json_encode(['status' => 0 ,'message' => $AtError]);
+                }
 
-							die;
+            }
 
-					 }
 
-					 else
+            $post['Available_qty'] = $post['Available_qty'];
 
-					 {
+            $post['sgst'] = $post['sgst'];
+            $post['cgst'] = $post['cgst'];
+            $post['igst'] = $post['igst'];
 
-							$file_data = $this->upload->data();
+            $post['ProductName'] = $post['ProductName'];
 
-							$post['productImage'] = $file_data['file_name'];
+            $post['ProductCategory'] = $post['ProductCategory'];
 
-					 }
+            $post['SKU'] = $post['SKU'];
 
-				}
+            $post['Price'] = $post['Price'];
+            $post['hsn'] = $post['hsn'];
+            $post['sac'] = $post['sac'];
 
-				
+            $post['SalePrice'] = $post['SalePrice'];
 
-				 
+            $post['description'] = $post['description'];
 
- 				 $post['Available_qty'] = $post['Available_qty'];
+            $post['ip_address'] = $this->input->ip_address();
 
-				  $post['sgst'] = $post['sgst'];
-				 $post['cgst'] = $post['cgst'];
-				 $post['igst'] = $post['igst'];
+            $post['create_date'] = date('Y-m-d H:i:s');
 
-				 $post['ProductName'] = $post['ProductName'];
 
-				 $post['ProductCategory'] = $post['ProductCategory'];
+            $id = $post['product_Id'];
 
-				 $post['SKU'] = $post['SKU'];
+            unset($post['product_Id'], $post['product_Image']);
 
-				 $post['Price'] = $post['Price'];
-				  $post['hsn'] = $post['hsn'];
-				   $post['sac'] = $post['sac'];
 
-				 $post['SalePrice'] = $post['SalePrice'];
+            $query = $this->ProductModel->UpdateProductByID($this->OuthModel->xss_clean($post), $id);
 
-				 $post['description'] = $post['description'];
 
- 				 $post['ip_address'] = $this->input->ip_address();
+            $response = '';
 
-				 $post['create_date'] = date('Y-m-d H:i:s');
+            if ($query == true) {
 
-				 
+                $response = ['status' => 1, 'message' => '<span style="color:#090;">Product Updated Successfully !</span>'];
 
-				 $id = $post['product_Id'];
+            } else {
 
-				 unset($post['product_Id'],$post['product_Image']);
+                $response = ['status' => 0, 'message' => '<span style="color:#900;">sorry we re having some technical problems. please try again !</span>'];
 
-				 
+            }
 
- 				  
+        }
 
- 				$query = $this->ProductModel->UpdateProductByID($this->OuthModel->xss_clean($post),$id);
 
-				 
+        echo json_encode($response);
 
-				$response='';
 
-				if($query == true){
+    }
 
-					$response = ['status' => 1 ,'message' => '<span style="color:#090;">Product Updated Successfully !</span>' ];
 
-				}else{
+    public function product_trash()
+    {
 
-					$response = ['status' => 0 ,'message' => '<span style="color:#900;">sorry we re having some technical problems. please try again !</span>' 						];
+        //sleep(5);
 
-				}
+        $this->OuthModel->CSRFVerify();
 
-           }
+        $id = $this->input->get('id');
 
-		   
 
-		   echo json_encode($response);
+        $product = $this->ProductModel->TrashProductByID($id);
 
-		
+        if ($product != false) {
 
- 	}
+            $json_data = ["status" => 1,
 
-	
+                "message" => 'One Product Deleted !',
 
-	public function product_trash(){ 
+            ];
 
-	//sleep(5);
+        } else {
 
-		$this->OuthModel->CSRFVerify();
+            $json_data = ["status" => 0,
 
-		$id=$this->input->get('id');
+                "message" => 'false',
 
-		
+            ];
 
- 		$product = $this->ProductModel->TrashProductByID($id);
+        }
 
-		if($product != false){
+        echo json_encode($json_data);
 
-			$json_data = [ "status"            => 1,  
 
-					"message"    => 'One Product Deleted !',   
+    }
 
- 					];
-
-		}else{
-
-			$json_data = [ "status" =>0,  
-
-					"message"    => 'false',   
-
- 					];
-
-		}
-
-		echo json_encode($json_data); 
-
-		
-
- 	}
-
-	 	
-
-	
 
 }
 
