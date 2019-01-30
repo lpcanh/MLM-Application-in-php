@@ -79,7 +79,7 @@ $db['default'] = array(
 
 	'username' => 'root',
 
-	'password' => '',
+	'password' => (ENVIRONMENT !== 'production' ? '' : 'tfk101'),
 
 	'database' => 'mlm',
 
