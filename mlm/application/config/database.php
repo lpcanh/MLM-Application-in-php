@@ -88,7 +88,7 @@ $db['default'] = array(
 
 	'username' => 'root',
 
-	'password' => '',
+	'password' => 'tkf101',
 
 	'database' => 'mlm',
 
