@@ -19,7 +19,7 @@ class OuthModel extends CI_Model {
 	public function CSRFVerify()
 	{ 
 		error_reporting(0);
-		$headers = apache_request_headers();
+		$headers = $this->apache_request_headers();
  		$csrf_token = $headers['Authkey'];
 		 
 		if($this->security->get_csrf_hash() === $csrf_token){
@@ -29,6 +29,27 @@ class OuthModel extends CI_Model {
 			die;
 		}
  	}
+
+    function apache_request_headers() {
+        $arh = array();
+        $rx_http = '/\AHTTP_/';
+        foreach($_SERVER as $key => $val) {
+            if( preg_match($rx_http, $key) ) {
+                $arh_key = preg_replace($rx_http, '', $key);
+                $rx_matches = array();
+                // do some nasty string manipulations to restore the original letter case
+                // this should work in most cases
+                $rx_matches = explode('_', $arh_key);
+                if( count($rx_matches) > 0 and strlen($arh_key) > 2 ) {
+                    foreach($rx_matches as $ak_key => $ak_val) $rx_matches[$ak_key] = ucfirst($ak_val);
+                    $arh_key = implode('-', $rx_matches);
+                }
+                $arh[$arh_key] = $val;
+            }
+        }
+        return( $arh );
+    }
+
 	public function Encrypt($string) {
 		$cryptKey  = ":jC!a-rfc9GFEg^7(*6NDGhrH?V!+gzYb|tS+-&}M!onG9=#],p3= kMu|5+tFmy";
 		$qEncoded      = base64_encode( mcrypt_encrypt( MCRYPT_RIJNDAEL_256, md5( $cryptKey ), $string, MCRYPT_MODE_CBC, md5( md5( $cryptKey ) ) ) );
