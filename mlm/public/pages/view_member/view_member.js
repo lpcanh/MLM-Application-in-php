@@ -86,7 +86,7 @@
 
     function buildTree(id, type){
         var binary = ($(this).prop('checked')) ? 'binary' : 'geneology';
-        $.get('/v3/member-net-sale-tree-json?id=' + id + '&type=' + type).then(function(resp){
+        $.get(BaseUrl + '/v3/member-net-sale-tree-json?id=' + id + '&type=' + type).then(function(resp){
             console.log(resp);
             chart_config.nodeStructure = resp;
             var tree = new Treant(chart_config);
