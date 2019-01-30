@@ -48,7 +48,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 */
 
-$config['base_url'] = 'http://'.$_SERVER['HTTP_HOST'].'/mlm';
+//$config['base_url'] = 'http://'.$_SERVER['HTTP_HOST'].'/mlm';
+$config['base_url'] = 'http://'.$_SERVER['HTTP_HOST'];
 
 
 
@@ -448,7 +449,7 @@ $config['allow_get_array'] = TRUE;
 
 */
 
-$config['log_threshold'] = 0;
+$config['log_threshold'] = 2;
 
 
 
@@ -762,7 +763,7 @@ $config['sess_cookie_name'] = 'ci_session';
 
 $config['sess_expiration'] = 7200;
 
-$config['sess_save_path'] = NULL;
+$config['sess_save_path'] = __DIR__.'/session';
 
 $config['sess_match_ip'] = FALSE;
 

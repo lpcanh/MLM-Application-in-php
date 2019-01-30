@@ -33,8 +33,6 @@ $route['v3/product-view'] = 'ProductController/product_view';
 $route['edit_product'] = 'ProductController/edit_product';
 $route['trash-product'] = 'ProductController/product_trash';
 
-
-
 $route['v3/add-order'] = 'OrderController/index';
 $route['v3/order-list'] = 'OrderController/order_list_template';
 $route['get_product_detail'] = 'OrderController/get_product_detail';
@@ -43,24 +41,16 @@ $route['add_order'] = 'OrderController/add_order';
 $route['order-grid-data'] = 'OrderController/order_grid_data';
 $route['trash-order'] = 'OrderController/order_trash';
 
- 
-
-
-
 $route['v3/customer-list'] = 'CustomerController/index';
 $route['customer-grid-data'] = 'CustomerController/customer_grid_data';
 $route['trash-member'] = 'CustomerController/trash';
-
-
-
-
-
  
 $route['v3/member-net-sale-view'] = 'Member/view_member_template';
 $route['v3/member-net-sale-view-chart'] = 'Member/login_customer_view';
 
 $route['v3/member-net-sale-json'] = 'Member/json';
 $route['v3/member-net-sale-infinity'] = 'Member/Parent';
+$route['v3/member-net-sale-tree-json'] = 'Member/treeJson';
 
 
 $route['v3/invoice/generate'] = 'InvoiceController/index';
@@ -76,11 +66,7 @@ $route['product_view'] = 'PurchaseController/product_view';
 $route['edit-purchase-product'] = 'PurchaseController/edit_product';
 $route['trash-purchase-product'] = 'PurchaseController/product_trash';
 
-
-
-
 $route['excel-purchase-product'] = 'ExcelController/index_purchase_products';
-
 
 $route['v3/category-list'] = 'CategoryController/index';
 $route['add-category'] = 'CategoryController/add_category';
@@ -89,19 +75,5 @@ $route['category_view'] = 'CategoryController/category_view';
 $route['edit-category'] = 'CategoryController/edit_category';
 $route['trash-category'] = 'CategoryController/category_trash';
 
-
-
-
 $route['v3/settings'] = 'SettingsController/index';
 $route['settings-update-tax'] = 'SettingsController/update_tax';
-
-
-
-
-
-
- 
- 
-
-
-
