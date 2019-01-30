@@ -19,9 +19,11 @@ class OuthModel extends CI_Model {
 	public function CSRFVerify()
 	{ 
 		error_reporting(0);
+        log_message('debug', 'Server: ' . json_encode($_SERVER));
 		$headers = $this->apache_request_headers();
- 		$csrf_token = $headers['Authkey'];
-		 
+        log_message('debug', 'Headers: ' . json_encode($headers));
+ 		$csrf_token = $headers['AUTHKEY'];
+        log_message('debug', 'AUTHKEY: ' . $csrf_token .'/'.$this->security->get_csrf_hash());
 		if($this->security->get_csrf_hash() === $csrf_token){
 			return;
 		}else{

@@ -156,6 +156,7 @@ class ProductController extends CI_Controller
 
     public function product_grid_data()
     {
+        log_message('debug', 'Server: ' . json_encode($_SERVER));
         log_message('debug', 'product_grid_data: ' . json_encode($_REQUEST));
         $this->OuthModel->CSRFVerify();
 
