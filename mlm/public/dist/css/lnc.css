@@ -33,3 +33,6 @@
 .Treant .node.collapsed { background-color: #DEF82D; }
 .Treant .node.collapsed .collapse-switch { background: none; }
 
+span.fancytree-custom-icon.yellow {
+    color: #8a6d3b;
+}

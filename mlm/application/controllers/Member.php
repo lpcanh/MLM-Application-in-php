@@ -302,6 +302,22 @@ class Member extends CI_Controller
         echo json_encode($tree);
     }
 
+    public function treeTableJson()
+    {
+        $id = $this->OuthModel->Encryptor('decrypt', $this->input->get('id'));
+        $type = $this->input->get('type');
+
+        $member = $this->UserModel->GetUserDataById1($id);
+
+        log_message('debug', 'Find Member: ' . json_encode($member));
+
+        $treeNode = $this->_buildNode($member, true);
+
+        $tree = $this->_buildTree($treeNode, $type);
+        header('Content-Type: application/json');
+        echo json_encode($tree->children);
+    }
+
     private function _buildTree($node, $type)
     {
         if($type == 'binary'){
@@ -312,6 +328,8 @@ class Member extends CI_Controller
 
         if ($children) {
             $node->children = [];
+            $node->folder = count($children) > 0;
+            $node->expanded = false;
             foreach ($children as $child) {
                 log_message('debug', 'Find Child: ' . json_encode($child));
                 $member = $this->UserModel->GetUserDataById1($child['id']);
@@ -340,6 +358,7 @@ class Member extends CI_Controller
         $treeChildNode = new stdClass();
         if ($isObject) {
             $treeChildNode->id = $node->id;
+            $treeChildNode->title = $node->name;
             $treeChildNode->image = $this->_userImage($node->picture_url);
             $treeChildNode->text = new stdClass();
             $treeChildNode->text->name = $node->name;
@@ -348,6 +367,7 @@ class Member extends CI_Controller
             $treeChildNode->text->address = $node->address;
         } else {
             $treeChildNode->id = isset($node['id']) ? $node['id'] : '';
+            $treeChildNode->title = $node['name'];
             $treeChildNode->image = $this->_userImage($node['picture_url']);
             $treeChildNode->name = $node['name'];
             $treeChildNode->mobile = isset($node['mobile_no']) ? $node['mobile_no'] : '';

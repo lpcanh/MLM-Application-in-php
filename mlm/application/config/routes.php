@@ -51,6 +51,7 @@ $route['v3/member-net-sale-view-chart'] = 'Member/login_customer_view';
 $route['v3/member-net-sale-json'] = 'Member/json';
 $route['v3/member-net-sale-infinity'] = 'Member/Parent';
 $route['v3/member-net-sale-tree-json'] = 'Member/treeJson';
+$route['v3/member-net-sale-treetable-json'] = 'Member/treeTableJson';
 
 
 $route['v3/invoice/generate'] = 'InvoiceController/index';

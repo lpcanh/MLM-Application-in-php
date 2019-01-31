@@ -4,9 +4,14 @@
 <link rel="stylesheet" href="<?= base_url('public'); ?>/hiten/css/app.css">
 
 <link rel="stylesheet" href="<?= base_url('public'); ?>/dist/libs/treant/Treant.css"/>
-<link rel="stylesheet" href="<?=base_url('public');?>/dist/libs/treant/vendor/perfect-scrollbar/perfect-scrollbar.css"/>
+<link rel="stylesheet"
+      href="<?= base_url('public'); ?>/dist/libs/treant/vendor/perfect-scrollbar/perfect-scrollbar.css"/>
 
 <link href="<?= base_url('public'); ?>/components/bootstrap-toggle/css/bootstrap-toggle.min.css" rel="stylesheet">
+<link href="<?= base_url('public'); ?>/components/jquery-treetable-3.2.0/css/jquery.treetable.css" rel="stylesheet"
+      type="text/css"/>
+
+<link href="<?= base_url('public'); ?>/components/fancy-tree-2.30.2/skin-win8/ui.fancytree.css" rel="stylesheet">
 <style>
     img {
         width: 45px;
@@ -50,9 +55,29 @@
                                     <div class="form-group">
                                         <label class="sr-only" for="tree-switch"></label>
                                         <input type="checkbox" id="tree-switch" checked></div>
-                                    </div>
+                                </div>
 
                                 <div id="tree-member-view"></div>
+                                <table id="treegrid" class="table table-hover table-bordered hide" style="width: 100%">
+                                    <colgroup>
+                                        <col width="*"/>
+                                        <col width="150px"/>
+                                        <col width="150px"/>
+                                        <col width="150px"/>
+                                        <col width="150px"/>
+                                    </colgroup>
+                                    <thead>
+                                    <tr>
+                                        <th>Partner</th>
+                                        <th>Live</th>
+                                        <th>Active Pack</th>
+                                        <th>MB Q.</th>
+                                        <th>Loyalty</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
                                 <!--div class="row" ng-app="amwayCalApp">
                                     <div class="span12" ng-view>
                                     </div>
@@ -73,14 +98,18 @@
     <script src="<?= base_url('public'); ?>/dist/libs/treant/vendor/raphael.js"></script>
     <script src="<?= base_url('public'); ?>/dist/libs/treant/Treant.js"></script>
     <script src="<?= base_url('public'); ?>/dist/libs/treant/vendor/jquery.easing.js"></script>
-
+    <script src="<?= base_url('public'); ?>/components/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
+    <script src="<?= base_url('public'); ?>/components/jquery-treetable-3.2.0/jquery.treetable.js"></script>
+    <script src="<?= base_url('public'); ?>/hiten/js/app-min.js"></script>
+    <script src="<?= base_url('public'); ?>/components/fancy-tree-2.30.2/modules/jquery.fancytree.ui-deps.js"></script>
+    <script src="<?= base_url('public'); ?>/components/fancy-tree-2.30.2/modules/jquery.fancytree.js"></script>
+    <script src="<?= base_url('public'); ?>/components/fancy-tree-2.30.2/modules/jquery.fancytree.gridnav.js"></script>
+    <script src="<?= base_url('public'); ?>/components/fancy-tree-2.30.2/modules/jquery.fancytree.table.js"></script>
     <script type="text/javascript">
         var MemberID = '<?=$this->input->get('id');?>';
         var BaseUrl = '<?=base_url();?>';
     </script>
-    <script src="<?= base_url('public'); ?>/components/bootstrap-toggle/js/bootstrap-toggle.min.js"></script>
 
-    <script src="<?= base_url('public'); ?>/hiten/js/app-min.js"></script>
     <script src="<?= base_url('public'); ?>/pages/view_member/view_member.js"></script>
 
 </body>

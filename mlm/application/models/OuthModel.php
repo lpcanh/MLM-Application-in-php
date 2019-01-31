@@ -24,7 +24,13 @@ class OuthModel extends CI_Model
         log_message('debug', 'Server: ' . json_encode($_SERVER));
         $headers = $this->apache_request_headers();
         log_message('debug', 'Headers: ' . json_encode($headers));
-        $csrf_token = $headers['AUTHKEY'];
+
+        if(isset($headers['AUTHKEY'])){
+            $csrf_token = $headers['AUTHKEY'];
+        } else if(isset($headers['Authkey'])){
+            $csrf_token = $headers['Authkey'];
+        }
+
         log_message('debug', 'AUTHKEY: ' . $csrf_token . '/' . $this->security->get_csrf_hash());
         if ($this->security->get_csrf_hash() === $csrf_token) {
             return;
