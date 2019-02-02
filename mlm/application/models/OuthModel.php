@@ -65,6 +65,7 @@ class OuthModel extends CI_Model
         }
     }
 
+    //Deprecate, not use
     public function Encrypt($string)
     {
         $cryptKey = ":jC!a-rfc9GFEg^7(*6NDGhrH?V!+gzYb|tS+-&}M!onG9=#],p3= kMu|5+tFmy";
@@ -72,6 +73,7 @@ class OuthModel extends CI_Model
         return ($qEncoded);
     }
 
+    //Deprecate, not use
     public function Decrypt($string)
     {
         $cryptKey = ":jC!a-rfc9GFEg^7(*6NDGhrH?V!+gzYb|tS+-&}M!onG9=#],p3= kMu|5+tFmy";
@@ -79,7 +81,7 @@ class OuthModel extends CI_Model
         return ($qDecoded);
     }
 
-    public function Encryptor($action, $string)
+    public function Encryptor1($action, $string)
     {
         $output = false;
 
@@ -101,6 +103,22 @@ class OuthModel extends CI_Model
         } else if ($action == 'decrypt') {
             //decrypt the given text/string/number
             $output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
+        }
+
+        return $output;
+    }
+
+    public function Encryptor($action, $string)
+    {
+        $output = false;
+
+        //do the encyption given text/string/number
+        if ($action == 'encrypt') {
+            $output =  $this->encryption->encrypt($string);
+            $output = base64_encode($output);
+        } else if ($action == 'decrypt') {
+            //decrypt the given text/string/number
+            $output = $this->encryption->decrypt(base64_decode($string));
         }
 
         return $output;
@@ -150,6 +168,4 @@ class OuthModel extends CI_Model
     {
         return password_verify($password, $hash);
     }
-
-
 }

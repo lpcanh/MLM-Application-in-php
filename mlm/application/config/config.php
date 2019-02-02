@@ -651,7 +651,7 @@ $config['cache_query_string'] = FALSE;
 
 */
 
-$config['encryption_key'] = '';
+$config['encryption_key'] = 'hitenVkuld%:bTXz,3r>6|FW#!7eSs>vM~n+48~{Mh$#A4p).)#wV3^_y-B.6WCar=b4.';
 
 
 
