@@ -78,3 +78,6 @@ $route['trash-category'] = 'CategoryController/category_trash';
 
 $route['v3/settings'] = 'SettingsController/index';
 $route['settings-update-tax'] = 'SettingsController/update_tax';
+
+$route['register'] = 'RegisterController/register_view';
+$route['do-register'] = 'RegisterController/register';

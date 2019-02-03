@@ -144,4 +144,17 @@ class UserModel extends CI_Model
             return false;
     }
 
+    public function IfExistUsername($username) 
+    {
+        $this->db->select('id, name, email, username');
+        $this->db->from($this->User);
+        $this->db->where('username', $username);
+        $query = $this->db->get();
+        if ($query->num_rows() != 0) {
+            return $query->row_array();
+        } else {
+            return false;
+        }
+    }
+
 }

@@ -912,7 +912,7 @@ $config['csrf_regenerate'] = TRUE;
 $config['csrf_exclude_uris'] = array('add_product','product-grid-data',
 'edit_product','add_order','order-grid-data','customer-grid-data','upload-profile','profile-password-update',
 'profile-details-update','add-purchase-product','edit-purchase-product','purchase-product-grid-data',
-'category-grid-data','add-category','edit-category');
+'category-grid-data','add-category','edit-category', 'do-register');
 
 
 
